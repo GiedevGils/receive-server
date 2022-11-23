@@ -1,0 +1,30 @@
+env:
+  commonjs: true
+  es6: true
+  node: true
+  jest: true
+extends:
+  - standard
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+  DependencyError: readonly
+  ValidationError: readonly
+  ServiceError: readonly
+parserOptions:
+  ecmaVersion: 2020
+rules:
+  require-await:
+    - error
+  newline-after-var:
+    - error
+    - always
+  comma-dangle:
+    - error
+    - always-multiline
+  no-unused-vars:
+    - error
+    - vars: all
+      args: after-used
+      argsIgnorePattern: _
+      ignoreRestSiblings: true
