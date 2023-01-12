@@ -25,8 +25,14 @@ app.post('/', function (req, res) {
     JSON.parse(req.rawBody)
 
     extension = 'json'
+    res.status(200).send({
+      OpdrachtID: 'Degene die is meegegeven',
+      ResponseCode: 'OK',
+      MessageID: Date.now(),
+    })
   } catch (e) {
     extension = 'xml'
+    res.status(200).send()
   }
 
   fs.writeFileSync(`output/result.${extension}`, req.rawBody, err => {
@@ -34,11 +40,6 @@ app.post('/', function (req, res) {
       console.error(err)
       throw err
     }
-  })
-  res.status(200).send({
-    OpdrachtID: JSON.parse(req.rawBody).OpdrachtID,
-    ResponseCode: 'OK',
-    MessageID: Date.now(),
   })
 })
 
