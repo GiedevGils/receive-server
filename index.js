@@ -15,8 +15,20 @@ function rawBody (req, res, next) {
   })
 }
 
+/**
+ *
+ * @param {import('express').Request} req
+ * @param {*} res
+ * @param {*} next
+ */
+function logger (req, res, next) {
+  console.log(`[${new Date().toISOString()}] - ${req.method} at url ${req.url}`)
+  next()
+}
+
 app.set('port', process.env.PORT || 1337)
 app.use(rawBody)
+app.use(logger)
 
 app.post('/', function (req, res) {
   let extension
