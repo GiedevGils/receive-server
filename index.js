@@ -53,6 +53,8 @@ app.post('/', function (req, res) {
       throw err
     }
   })
+
+  console.log(`saved to output/result.${extension}`)
 })
 
 app.get('/', function (req, res) {
