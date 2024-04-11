@@ -30,14 +30,14 @@ app.set('port', process.env.PORT || 1337)
 app.use(rawBody)
 app.use(logger)
 
-app.post('/', function (req, res) {
+app.post('*', (req, res) => {
   let extension
 
   try {
     JSON.parse(req.rawBody)
 
     extension = 'json'
-    res.status(200).send({
+    res.status(500).send({
       OpdrachtID: 'Degene die is meegegeven',
       ResponseCode: 'OK',
       MessageID: Date.now(),
@@ -55,15 +55,7 @@ app.post('/', function (req, res) {
   })
 
   console.log(`saved to output/result.${extension}`)
-})
-
-app.get('/', function (req, res) {
-  console.log('get request')
-  res.status(200).json({ message: 'request received' })
-})
-
-app.post('*', (req, res) => {
-  res.status(200).send()
+  res.status(500).send()
 })
 
 http.createServer(app).listen(app.get('port'), function () {
