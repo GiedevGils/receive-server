@@ -37,14 +37,8 @@ app.post('*', (req, res) => {
     JSON.parse(req.rawBody)
 
     extension = 'json'
-    res.status(500).send({
-      OpdrachtID: 'Degene die is meegegeven',
-      ResponseCode: 'OK',
-      MessageID: Date.now(),
-    })
   } catch (e) {
     extension = 'xml'
-    res.status(200).send()
   }
 
   fs.writeFileSync(`output/result.${extension}`, req.rawBody, err => {
@@ -55,7 +49,7 @@ app.post('*', (req, res) => {
   })
 
   console.log(`saved to output/result.${extension}`)
-  res.status(500).send()
+  res.status(200).send()
 })
 
 http.createServer(app).listen(app.get('port'), function () {
