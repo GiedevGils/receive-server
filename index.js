@@ -2,6 +2,11 @@ const express = require('express')
 const http = require('http')
 const fs = require('fs')
 
+const config = {
+  logHeaders: true,
+  logBody: false,
+}
+
 const app = express()
 
 function rawBody (req, res, next) {
@@ -23,6 +28,8 @@ function rawBody (req, res, next) {
  */
 function logger (req, res, next) {
   console.log(`[${new Date().toISOString()}] - ${req.method} at url ${req.url}`)
+  if (config.logHeaders) console.log(req.headers)
+  if (config.logBody) console.log(req.body)
   next()
 }
 
@@ -49,7 +56,7 @@ app.post('*', (req, res) => {
   })
 
   console.log(`saved to output/result.${extension}`)
-  res.status(200).send()
+  res.status(200).send({ OpdrachtID: '123' })
 })
 
 http.createServer(app).listen(app.get('port'), function () {
