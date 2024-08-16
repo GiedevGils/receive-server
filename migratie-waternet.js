@@ -33,9 +33,13 @@ async function main () {
 
     const data = fs.readFileSync(path.join(__dirname, `${INPUT_FOLDER}/${file}`))
 
+    let input = sanitize(data)
+
+    input = removeEmpty(input)
+
     /** @type {import('axios').AxiosRequestConfig} */
     const requestOptions = {
-      data,
+      data: input,
       url: `http://localhost:8080/rest/dsp/${mappedMessageType}`,
       method: 'POST',
       headers: {
@@ -63,3 +67,43 @@ async function main () {
 }
 
 main()
+
+function sanitize (input) {
+  const json = JSON.parse(input.toString())
+
+  const arr = json.Leveradres?.AdresOrGPSLocatieOrBAGLocatie
+
+  if (!arr?.at(0)) return input
+
+  const { Adres, GPSLocatie, BAGLocatie, BGTLocatie } = arr.at(0)
+
+  Adres.Gemeentecode = Adres.GemeenteCode
+  delete Adres.GemeenteCode
+
+  BGTLocatie['BGT-ID'] = BGTLocatie.BGTID
+  delete BGTLocatie.BGTID
+
+  json.Leveradres.AdresOrGPSLocatieOrBAGLocatie = [
+    { Adres }, { GPSLocatie }, { BAGLocatie }, { BGTLocatie },
+  ]
+
+  return json
+}
+
+function removeEmpty (obj) {
+  if (!obj || typeof obj !== 'object') {
+    return obj
+  }
+
+  Object.entries(obj).forEach(([key, value]) => {
+    if (Array.isArray(value)) { value.forEach(removeEmpty) } else if (typeof value === 'object') {
+      value = removeEmpty(value)
+    }
+
+    if (!value || value === '') {
+      delete obj[key]
+    }
+  })
+
+  return obj
+}
