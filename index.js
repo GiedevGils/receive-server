@@ -6,6 +6,17 @@ const config = {
   logHeaders: false,
   logBody: false,
 }
+const xmlResponse = `
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bij1="http://dsplatform.nl/v136/participant/Bijstelling">
+  <soapenv:Body>
+    <ns6:MT_CommonResponse xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:ns2='http://dsplatform.nl/v136/participant/Planning' xmlns:ns6='http://dsplatform.nl/dsp/Common' xmlns:ns4='http://dsplatform.nl/v136/dsp/Planning' xmlns:ns3='http://dsplatform.nl/dsp/Header' xmlns:ns5='http://dsplatform.nl/v136/dsp/Algemeen'>
+    <OpdrachtID>ENX-S-4715627</OpdrachtID>
+    <ResponseCode>OK</ResponseCode>
+    <MessageID>43eef9295ba111efc28f0000007baf16</MessageID>
+    </ns6:MT_CommonResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+`
 
 const app = express()
 
@@ -38,15 +49,17 @@ app.use(rawBody)
 app.use(logger)
 
 app.post('*', (req, res) => {
-  let extension
+  let extension, response
   const { filename, status } = req.query
 
   try {
     JSON.parse(req.rawBody)
 
     extension = 'json'
+    response = { OpdrachtID: '123' }
   } catch (e) {
     extension = 'xml'
+    response = xmlResponse
   }
 
   const fileLocation = `output/${filename || 'result'}.${extension}`
@@ -59,7 +72,10 @@ app.post('*', (req, res) => {
   })
 
   console.log(`saved to ${fileLocation}`)
-  res.status(status || 200).send({ OpdrachtID: '123' })
+  res
+    .status(status || 200)
+    .setHeader('Content-Type', extension === 'json' ? 'application/json' : 'application/xml')
+    .send(response)
 })
 
 http.createServer(app).listen(app.get('port'), function () {
