@@ -3,7 +3,7 @@ const http = require('http')
 const fs = require('fs')
 
 const config = {
-  logHeaders: true,
+  logHeaders: false,
   logBody: false,
 }
 
@@ -39,6 +39,7 @@ app.use(logger)
 
 app.post('*', (req, res) => {
   let extension
+  const { filename, status } = req.query
 
   try {
     JSON.parse(req.rawBody)
@@ -48,15 +49,17 @@ app.post('*', (req, res) => {
     extension = 'xml'
   }
 
-  fs.writeFileSync(`output/result.${extension}`, req.rawBody, err => {
+  const fileLocation = `output/${filename || 'result'}.${extension}`
+
+  fs.writeFileSync(fileLocation, req.rawBody, err => {
     if (err) {
       console.error(err)
       throw err
     }
   })
 
-  console.log(`saved to output/result.${extension}`)
-  res.status(200).send({ OpdrachtID: '123' })
+  console.log(`saved to ${fileLocation}`)
+  res.status(status || 200).send({ OpdrachtID: '123' })
 })
 
 http.createServer(app).listen(app.get('port'), function () {
