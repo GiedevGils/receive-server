@@ -23,12 +23,13 @@ async function main () {
   const files = fs.readdirSync('input-migratie')
 
   for (const file of files) {
-    const [opdrachtId, messageType, versie, dateTime] = file.split('_')
+    const [opdrachtId, messageType, datePlusHour, minutes, seconds, versie] = file.split('_')
 
-    const [date, time] = dateTime.split('.').at(0).split(' ')
+    const [date, hour] = datePlusHour.split(' ')
 
-    const [l1, l2, l3, l4, l5, l6] = time
-    const datetime = `${date}T${l1}${l2}:${l3}${l4}:${l5}${l6}Z`
+    const datetime = `${date}T${hour}:${minutes}:${seconds}Z`
+
+    console.log(datetime)
     const mappedMessageType = messageRouteMap[messageType.toLowerCase()]
 
     const data = fs.readFileSync(path.join(__dirname, `${INPUT_FOLDER}/${file}`))
