@@ -29,7 +29,6 @@ async function main () {
 
     const datetime = `${date}T${hour}:${minutes}:${seconds}Z`
 
-    console.log(datetime)
     const mappedMessageType = messageRouteMap[messageType.toLowerCase()]
 
     const data = fs.readFileSync(path.join(__dirname, `${INPUT_FOLDER}/${file}`))
@@ -56,7 +55,7 @@ async function main () {
 
       await fs.rename(
         path.join(__dirname, `output/${mappedMessageType}.xml`),
-        path.join(__dirname, `output-migratie/${opdrachtId}__${mappedMessageType}__${datetime}__${versie}.xml`),
+        path.join(__dirname, `output-migratie/${opdrachtId}__${mappedMessageType}__${datetime}__${versie.split('.').at(0)}.xml`),
         (e) => { if (e) { return console.error } },
       )
     } catch (e) {
