@@ -25,6 +25,8 @@ async function main () {
   for (const file of files) {
     const [opdrachtId, messageType, datePlusHour, minutes, seconds, versie] = file.split('_')
 
+    const actualVersie = `${versie.split('.').at(0)}${versie.split('.').at(1)}`
+
     const [date, hour] = datePlusHour.split(' ')
 
     const datetime = `${date}T${hour}:${minutes}:${seconds}Z`
@@ -55,13 +57,14 @@ async function main () {
 
       await fs.rename(
         path.join(__dirname, `output/${mappedMessageType}.xml`),
-        path.join(__dirname, `output-migratie/${opdrachtId}__${mappedMessageType}__${datetime}__${versie.split('.').at(0)}.xml`),
+        // path.join(__dirname, `output-migratie/${opdrachtId}__${mappedMessageType}__${actualVersie}.xml`),
+        path.join(__dirname, `output-migratie/${opdrachtId}__${mappedMessageType}__${datetime.replaceAll(':', '.,')}__${actualVersie}.xml`),
         (e) => { if (e) { return console.error } },
       )
     } catch (e) {
       const { data, ...rest } = requestOptions
 
-      console.error({ ...rest, msg: e.emessage, filename: file })
+      console.error({ ...rest, msg: e.message, filename: file })
     }
   }
 }
@@ -80,12 +83,19 @@ function sanitize (input) {
   Adres.Gemeentecode = Adres.GemeenteCode
   delete Adres.GemeenteCode
 
-  BGTLocatie['BGT-ID'] = BGTLocatie.BGTID
-  delete BGTLocatie.BGTID
+  const adressen = []
 
-  json.Leveradres.AdresOrGPSLocatieOrBAGLocatie = [
-    { Adres }, { GPSLocatie }, { BAGLocatie }, { BGTLocatie },
-  ]
+  if (Adres) adressen.push({ Adres })
+  if (GPSLocatie) adressen.push({ GPSLocatie })
+  if (BAGLocatie) adressen.push({ BAGLocatie })
+
+  if (BGTLocatie) {
+    BGTLocatie['BGT-ID'] = BGTLocatie.BGTID
+    delete BGTLocatie.BGTID
+    adressen.push({ BGTLocatie })
+  }
+
+  json.Leveradres.AdresOrGPSLocatieOrBAGLocatie = adressen
 
   return json
 }
