@@ -5,6 +5,7 @@ const fs = require('fs')
 const config = {
   logHeaders: false,
   logBody: false,
+  port: 3500,
 }
 const xmlResponse = `
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bij1="http://dsplatform.nl/v136/participant/Bijstelling">
@@ -44,7 +45,7 @@ function logger (req, res, next) {
   next()
 }
 
-app.set('port', process.env.PORT || 1337)
+app.set('port', config.port)
 app.use(rawBody)
 app.use(logger)
 
@@ -73,7 +74,7 @@ app.post('*', (req, res) => {
 
   console.log(`saved to ${fileLocation}`)
   res
-    .status(status || 200)
+    .status(+status || 200)
     .setHeader('Content-Type', extension === 'json' ? 'application/json' : 'application/xml')
     .send(response)
 })
