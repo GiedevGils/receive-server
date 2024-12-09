@@ -5,7 +5,7 @@ const fs = require('fs')
 const config = {
   logHeaders: false,
   logBody: false,
-  port: 3500,
+  port: 3020,
 }
 const xmlResponse = `
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bij1="http://dsplatform.nl/v136/participant/Bijstelling">
