@@ -53,19 +53,24 @@ app.post('*', (req, res) => {
   let extension, response
   const { filename, status } = req.query
 
+  let content
+
   try {
-    JSON.parse(req.rawBody)
+    const json = JSON.parse(req.rawBody)
+
+    content = JSON.stringify(json, null, 2)
 
     extension = 'json'
     response = { OpdrachtID: '123' }
   } catch (e) {
+    content = req.rawBody
     extension = 'xml'
     response = xmlResponse
   }
 
   const fileLocation = `output/${filename || 'result'}.${extension}`
 
-  fs.writeFileSync(fileLocation, req.rawBody, err => {
+  fs.writeFileSync(fileLocation, content, (err) => {
     if (err) {
       console.error(err)
       throw err
@@ -75,7 +80,10 @@ app.post('*', (req, res) => {
   console.log(`saved to ${fileLocation}`)
   res
     .status(+status || 200)
-    .setHeader('Content-Type', extension === 'json' ? 'application/json' : 'application/xml')
+    .setHeader(
+      'Content-Type',
+      extension === 'json' ? 'application/json' : 'application/xml',
+    )
     .send(response)
 })
 
