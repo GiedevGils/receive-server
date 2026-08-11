@@ -70,6 +70,7 @@ app.post('*', (req, res) => {
 
   const fileLocation = `output/${filename || 'result'}.${extension}`
 
+  fs.mkdirSync('output', { recursive: true })
   fs.writeFileSync(fileLocation, content, (err) => {
     if (err) {
       console.error(err)
